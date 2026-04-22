@@ -22,19 +22,22 @@ import { fastifyStatic, ListRender } from '@fastify/static';
 import { join, dirname } from 'path';
 import rawbody from 'raw-body';
 import { Transport, MicroserviceOptions } from '@nestjs/microservices';
+import he from 'he';
+import he from 'he';
+import he from 'he';
 
 const renderDirList: ListRender = (dirs, files) => {
   const currDir = dirname((dirs[0] || files[0]).href);
   const parentDir = dirname(currDir);
-  return `
-    <head><title>Index of ${currDir}/</title></head>
+  return he.escape(`
+    <head><title>Index of ${he.escape(currDir)}/</title></head>
     <html><body>
-      <h1>Index of ${currDir}/</h1>
+      <h1>Index of ${he.escape(currDir)}/</h1>
       <hr>
       <table style="width: max(450px, 50%);">
         <tr>
           <td>
-            <a href="${parentDir}">../</a>
+            <a href="${he.escape(parentDir)}">../</a>
           </td>
           <td></td><td></td>
         </tr>
@@ -70,7 +73,7 @@ const renderDirList: ListRender = (dirs, files) => {
       </table>
       <hr>
     </body></html>
-  `;
+  `);
 };
 
 async function bootstrap() {
@@ -284,4 +287,3 @@ if (cluster.isPrimary && process.env.NODE_ENV === 'production') {
 } else {
   bootstrap();
   console.log(`Worker ${process.pid} started`);
-}
