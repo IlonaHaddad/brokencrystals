@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Header from '../main/Header/Header';
 import { postHiddenUpload } from '../../api/httpClient';
 import type { HiddenUploadResponse } from '../../interfaces/HiddenUploadResponse';
+import DOMPurify from 'dompurify';
 
 const HiddenUpload: FC = () => {
   const [uploading, setUploading] = useState(false);
@@ -129,7 +130,7 @@ const HiddenUpload: FC = () => {
             {fileName && (
               <div
                 style={{ marginTop: 8 }}
-                dangerouslySetInnerHTML={{ __html: fileName }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(fileName) }}
               />
             )}
             <label
