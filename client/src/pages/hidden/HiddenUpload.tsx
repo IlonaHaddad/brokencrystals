@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Header from '../main/Header/Header';
 import { postHiddenUpload } from '../../api/httpClient';
 import type { HiddenUploadResponse } from '../../interfaces/HiddenUploadResponse';
+import DOMPurify from 'dompurify';
 
 const HiddenUpload: FC = () => {
   const [uploading, setUploading] = useState(false);
@@ -19,6 +20,14 @@ const HiddenUpload: FC = () => {
     file.type.startsWith('image/') ||
     /\.(png|jpe?g|svg)$/i.test(file.name ?? '');
 
+  const sanitizeSvg = (svgContent: string) => {
+    // Basic sanitization: remove script tags and on* attributes
+    return svgContent
+      .replace(/<script.*?>.*?<\/script>/gi, '')
+      .replace(/\son\w+="[^"]*"/gi, '')
+      .replace(/\son\w+='[^']*'/gi, '');
+  };
+
   const buildPreview = (file: File) =>
     new Promise<{ content: string; isSvg: boolean }>((resolve, reject) => {
       const isSvg =
@@ -30,7 +39,12 @@ const HiddenUpload: FC = () => {
           reject(new Error('Could not read file for preview'));
           return;
         }
-        resolve({ content: reader.result, isSvg });
+        if (isSvg) {
+          const sanitized = sanitizeSvg(reader.result);
+          resolve({ content: sanitized, isSvg });
+        } else {
+          resolve({ content: reader.result, isSvg });
+        }
       };
       reader.onerror = () =>
         reject(new Error('Could not read file for preview'));
@@ -129,8 +143,9 @@ const HiddenUpload: FC = () => {
             {fileName && (
               <div
                 style={{ marginTop: 8 }}
-                dangerouslySetInnerHTML={{ __html: fileName }}
-              />
+              >
+                {DOMPurify.sanitize(fileName)}
+              </div>
             )}
             <label
               className="form-label"
