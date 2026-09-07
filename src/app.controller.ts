@@ -55,6 +55,7 @@ import { JwtProcessorType } from './auth/auth.service';
 import { AppService } from './app.service';
 import { BASIC_USER_INFO, UserDto } from './users/api/UserDto';
 import { SWAGGER_DESC_FIND_USER } from './users/users.controller.swagger.desc';
+import { VM } from 'vm2';
 
 @Controller('/api')
 @ApiTags('App controller')
@@ -216,7 +217,11 @@ export class AppController {
     this.logger.debug(`Processing crystals with ${numbers.length} values`);
 
     try {
-      const result = eval(processNumbersExpression);
+      const vm = new VM({
+        timeout: 1000,
+        sandbox: { numbers }
+      });
+      const result = vm.run(processNumbersExpression);
 
       // SSJI payload may already end the response
       if (response.sent || response.raw.writableEnded) {
