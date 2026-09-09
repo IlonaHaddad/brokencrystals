@@ -33,6 +33,7 @@ import {
   SWAGGER_DESC_SAVE_RAW_CONTENT
 } from './file.controller.swagger.desc';
 import { CloudProvidersMetaData } from './cloud.providers.metadata';
+import * as he from 'he';
 
 @Controller('/api/file')
 @ApiTags('Files controller')
@@ -289,7 +290,7 @@ export class FileController {
       if (typeof raw === 'string' || Buffer.isBuffer(raw)) {
         await fs.promises.access(path.dirname(file), W_OK);
         await fs.promises.writeFile(file, raw);
-        return `File uploaded successfully at ${file}`;
+        return he.escape(`File uploaded successfully at ${file}`);
       }
     } catch (err) {
       this.logger.error(err.message);
