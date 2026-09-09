@@ -2,9 +2,10 @@ import type { ChangeEvent, FC, KeyboardEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { queryChat } from '../../api/httpClient';
 import type { ChatMessage } from '../../interfaces/ChatMessage';
+import DOMPurify from 'dompurify';
 
 const UnsafeComponent: FC<{ html: string }> = ({ html }) => {
-  return <div dangerouslySetInnerHTML={{ __html: html }} />;
+  return <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }} />;
 };
 
 export const ChatWidget: FC = () => {
